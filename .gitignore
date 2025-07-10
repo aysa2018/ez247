@@ -1,1 +1,78 @@
-__pycache__/\n.env\n*.log
+# Python
+__pycache__/
+*.py[cod]
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+
+# Environment
+.env
+.venv/
+venv/
+ENV/
+env/
+*.env
+
+# macOS
+.DS_Store
+
+# Ollama
+.ollama/
+ollama.log
+ollama-cache/
+
+# Logs
+*.log
+*.tmp
+*.bak
+
+# Jupyter
+.ipynb_checkpoints
+
+# Docker
+*.pid
+*.tar
+docker-compose.override.yml
+
+# VSCode
+.vscode/
+
+# PyCharm
+.idea/
+
+# System files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Audio/video
+*.wav
+*.mp3
+*.mp4
+*.flac
+*.m4a
+
+# TTS / Transcriptions
+transcripts/
+tts_output/
+cache/
+
+# Models
+*.onnx
+*.pth
+*.ckpt
+*.pt
+
+# Coverage
+.coverage
+coverage.xml
+htmlcov/
+
+# Test artifacts
+test/__pycache__/
+tests/__pycache__/
+*.pytest_cache/
+.nox/
+.tox/

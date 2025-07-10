@@ -1,0 +1,44 @@
+
+1. Prerequisites
+Python 3.9+ (but <3.13; recommend 3.10 or 3.11 for best compatibility)
+Homebrew (for easy package management)
+No NVIDIA GPU: You will be running everything on CPU, which will be slower for AI tasks, but it will work.
+Docker (Optional): You can try Docker, but GPU acceleration is not available on Mac, so manual install is often easier for debugging.
+2. Install  Homebrew
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+3. Install python (if needed)
+brew install python@3.11 (or 3.10)
+4. Clone the repository (or cd into repository if already installed)
+git clone https://github.com/KoljaB/RealtimeVoiceChat.git
+cd RealtimeVoiceChat
+5. Create and activate a Virtual environment
+python -m venv venv
+source venv/bin/activate
+6. Upgrade pip
+pip install --upgrade pip
+7. Install PyTorch (CPU-only for Apple Silicon)
+pip install torch torchvision torchaudio
+8. Install Other Requirements
+pip install -r requirements.txt
+If you get errors with deepspeed, you can skip it for now (it's mainly for TTS speedup and not required for basic functionality on CPU).
+9. Install PortAudio for Microphone Support
+brew install portaudio
+pip install pyaudio
+10. Navigate to the Code Directory and run the server
+cd code
+python server.py
+11. Access the Web Interface
+Open https://localhost:8000 on your browser
+12. If you get errors about missing libraries (e.g. libom) try brew install libomp
+If you get errors with pyaudio, ensure portaudio is installed via Homebrew
+If you get errors with deepspeed, you can comment it out in requirements.txt and try again
+deepspeed errors - change all instances of use_deepspeed=True to False
+13. In server.py, comment out the TTS_START_ENGINE="coqui" and switch it to a different model (e.g. kokoro or orpheus)
+14. Download and install from: https://ollama.com/download
+15. After installing, run ollama server in a terminal to start the ollama server. Make sure it's running and accesible at http://127.0.0.1:11434
+16. Run ollama pull mistral to pull the mistral model for this to work on a mac (will download a 4.1GB model)
+17. Change two instances at top of transcribe.py file to tiny.en for better performance
+18. Shorten/alter the prompt in system_prompt.txt to ~1 paragraph for better performance
+19. Change all instances of the model "hf.co/bartowski/huihui-ai_Mistral-Small-24B-Instruct-2501-abliterated-GGUF:Q4_K_M" to "mistral" (in server.py and speech_pipeline_manager.py files)
+20. Set "wake_words" from "jarvis" to an empty string "" and "wakeword_backend" to None in transcribe.py (disable wake words -- these aren't supported on Apple Silicon Macs)
+20. Run server.py again after mistral installs and ollama is running 
