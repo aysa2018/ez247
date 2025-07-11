@@ -1,27 +1,44 @@
 import requests
 import json
-import re
-import ast
-
-# --- STEP 1: Call LLM via Ollama running on localhost ---
-
 
 def call_llm(prompt):
-    import json
-    import requests
-
     system_prompt = """
-You are a backend agent that can only respond with function calls.
+You are a backend API agent. You must ONLY respond with valid Python-style function calls using keyword arguments.
+
+🛑 NEVER include emojis, extra words, or explanations in your output.
+✅ Your output MUST look exactly like this:
+CALL get_price(item="Chicken Teriyaki")
 
 Available functions:
-- place_order(item, quantity): Place a food order
-- check_availability(item): Check if an item is available
 
-❗Rules:
-- ONLY respond in this format:
-  CALL <function_name>(param1=value1, param2=value2)
-- NEVER explain or say anything else.
-- If you're unsure, guess.
+- place_order(item=..., quantity=...)
+  → Place a food order.
+
+- check_availability(item=...)
+  → Check if a category or item is available.
+
+- get_price(item=...)
+  → Get the price of a specific item or flavor.
+
+- clarify_category(category=...)
+  → Ask the user what they want from a category like 'pizza' or 'acai bowl'.
+
+Rules:
+1. Respond with ONLY ONE function call:
+    CALL function_name(param=value, ...)
+    - Never return more than one function call.
+    - Never add text, emojis, or explanation.
+2. Always use `CALL function_name(param1=value1, param2=value2)` format.
+3. All parameters must use keyword syntax.
+4. Do not include ✔, ❌, ✅, or any sentence outside the function call.
+5. If someone asks about a category like 'pizzas', call:
+   CALL check_availability(item="pizza")
+   Then: CALL clarify_category(category="pizza") if available.
+6. Only call `place_order()` after the user specifies a **flavor or item**, not just a category.
+7. Output must only be the function call. Nothing before or after.
+
+❗You must output a SINGLE line that starts with `CALL` and contains no additional commentary.
+
 """
 
     try:
@@ -33,13 +50,12 @@ Available functions:
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": prompt}
                 ],
-                "stream": True  # explicitly ask for streamed chunks
+                "stream": True
             },
-            stream=True  # tell requests to handle stream
+            stream=True
         )
 
         content_parts = []
-
         for line in res.iter_lines(decode_unicode=True):
             if not line.strip():
                 continue
@@ -51,30 +67,25 @@ Available functions:
                 continue
 
         full_content = ''.join(content_parts).strip()
-        print("🧠 LLM Output:", full_content)
+        # print("🧠 LLM Output:", full_content)
         return full_content
 
     except Exception as e:
         return f"⚠️ Ollama Error: {e}"
 
-
-
-# --- STEP 2: Send LLM result to MCP backend ---
 def call_mcp(prompt):
     try:
         res = requests.post("http://localhost:9000/mcp", json={"query": prompt})
         data = res.json()
         return data.get("response", "⚠️ No 'response' key in MCP output.")
-    except json.JSONDecodeError:
-        return f"⚠️ MCP Error: Invalid JSON response: {res.text}"
     except Exception as e:
-        return f"⚠️ MCP Error: {str(e)}"
+        return f"⚠️ MCP Error: {e}"
 
-# --- Run test flow ---
 if __name__ == "__main__":
     user_input = input("🧑 You: ")
-    
     llm_output = call_llm(user_input)
+    print("🧠 LLM Output:", llm_output)
+    
     if not llm_output:
         exit(1)
 
